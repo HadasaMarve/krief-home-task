@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - ./api/uploads:/usr/src/app/uploads
+    environment:
+
+      - DATABASE_HOST='localhost'
+      - DATABASE_USER='postgres'
+      - DATABASE_PASSWORD='postgres'
+      - DATABASE_NAME='krief'
+
+  worker:
+    build: ./worker
+    depends_on:
+      - db
+    volumes:
+
+      - ./api/uploads:/usr/src/app/uploads
+    environment:
+      - DATABASE_HOST='localhost'
+      - DATABASE_USER='postgres'
+      - DATABASE_PASSWORD='postgres'
+      - DATABASE_NAME='krief'
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'krief'
+    volumes:
+
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"  
+
